@@ -1,0 +1,16 @@
+[Unit]
+Description=sun2000mqtt daemon
+Wants=network.target
+
+[Service]
+User=
+Group=users
+WorkingDirectory=/tmp
+
+Type=idle
+ExecStart=/usr/local/bin/sun2000mqtt
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target

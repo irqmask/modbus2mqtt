@@ -1,0 +1,11 @@
+mqtt:
+{
+    address = "127.0.0.1";
+    port = 1883;
+    topic = "sun2000";
+}
+register = ( {
+    name = "hello";
+    interval = 60;
+}
+)
