@@ -73,6 +73,7 @@ AppSettings::AppSettings(std::string pathAndFilename)
     catch (const SettingNotFoundException &ex) {
         throw std::runtime_error("Either node 'mqtt' or contained properties 'address', 'port' or 'topic' are missing!");
     }
+
     // parse config file's notifications settings
     try {
         const Setting &root = cfg.getRoot();
