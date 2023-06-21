@@ -51,23 +51,20 @@ void AutoQuery::loopOnce()
                 switch (rd.type) {
                 case AutoQuery::ValType::VAL_TYPE_U16:
                     val = modbus->readRegisterU16(rd.reg_number);
-                    val *= rd.scaling_factor;
                     break;
                 case AutoQuery::ValType::VAL_TYPE_I16:
                     val = modbus->readRegisterI16(rd.reg_number);
-                    val *= rd.scaling_factor;
                     break;
                 case AutoQuery::ValType::VAL_TYPE_U32:
                     val = modbus->readRegisterU32(rd.reg_number);
-                    val *= rd.scaling_factor;
                     break;
                 case AutoQuery::ValType::VAL_TYPE_I32:
                     val = modbus->readRegisterI32(rd.reg_number);
-                    val *= rd.scaling_factor;
                     break;
                 default:
                     break;
                 }
+                val /= rd.scaling_factor;
     
                 std::cerr << now.count() << ": Item " << item->name << " value " << val << " posted under topic " << item->topic << std::endl;
                 mqtt->publish(item->topic, std::to_string(val));
