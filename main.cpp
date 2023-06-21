@@ -81,32 +81,8 @@ AutoQuery::ItemDefinitions SUN2000Regs = {
 
 int main(int argc, char** argv)
 {
-    bool run = true;
-    std::shared_ptr<AppSettings> settings;
-    std::shared_ptr<MQTT> mqtt;
-    std::shared_ptr<Modbus> modbus;
-    std::shared_ptr<AutoQuery> autoQuery;
 
-    // Initialize components
-    try {
-        settings = std::make_shared<AppSettings>("");
-        mqtt = std::make_shared<MQTT>(settings->getMqttServerAddress(), settings->getMqttServerPort());
-        mqtt->setMainTopic(settings->getMqttTopic());
-        modbus = std::make_shared<Modbus>(settings->getModbusDeviceName(), 
-                                               settings->getModbusBaudrate(),
-                                               settings->getModbusDataBits(),
-                                               settings->getModbusParity(),
-                                               settings->getModbusStopBits(),
-                                               settings->getModbusAddress());
-        autoQuery = std::make_shared<AutoQuery>(SUN2000Regs, modbus, mqtt);
-        autoQuery->loadQueryTable(settings->getQueryTable());
-    }
-    catch (std::exception &e) {
-        std::cerr << "Error initializing components: " << std::endl << e.what() << std::endl;
-        return -1;
-    }
-
-    modbus_t *mb;
+        modbus_t *mb;
     uint16_t tab_reg[32];
     uint32_t temp;
     float value;
@@ -151,6 +127,33 @@ int main(int argc, char** argv)
 
     modbus_close(mb);
     modbus_free(mb);
+
+
+    bool run = true;
+    std::shared_ptr<AppSettings> settings;
+    std::shared_ptr<MQTT> mqtt;
+    std::shared_ptr<Modbus> modbus;
+    std::shared_ptr<AutoQuery> autoQuery;
+
+    // Initialize components
+    try {
+        settings = std::make_shared<AppSettings>("");
+        mqtt = std::make_shared<MQTT>(settings->getMqttServerAddress(), settings->getMqttServerPort());
+        mqtt->setMainTopic(settings->getMqttTopic());
+        modbus = std::make_shared<Modbus>(settings->getModbusDeviceName(), 
+                                               settings->getModbusBaudrate(),
+                                               settings->getModbusDataBits(),
+                                               settings->getModbusParity(),
+                                               settings->getModbusStopBits(),
+                                               settings->getModbusAddress());
+        autoQuery = std::make_shared<AutoQuery>(SUN2000Regs, modbus, mqtt);
+        autoQuery->loadQueryTable(settings->getQueryTable());
+    }
+    catch (std::exception &e) {
+        std::cerr << "Error initializing components: " << std::endl << e.what() << std::endl;
+        return -1;
+    }
+
     while (run) {
         try {
             autoQuery->loopOnce();
@@ -160,7 +163,6 @@ int main(int argc, char** argv)
             std::cerr << "Error " << e.what() << std::endl;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        //run = false; // FIXME delete this line
     }
 
     return 0;
