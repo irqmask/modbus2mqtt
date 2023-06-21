@@ -92,6 +92,7 @@ AppSettings::AppSettings(std::string pathAndFilename)
         modbusDataBits = tempDataBits;
         modbusParity = tempParity[0];
         modbusStopBits = tempStopBits;
+        modbusAddress = tempModbusAddress;
     } 
     catch (const SettingNotFoundException &ex) {
         std::stringstream errmsg;

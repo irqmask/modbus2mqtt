@@ -89,7 +89,7 @@ int main(int argc, char** argv)
 
     // Initialize components
     try {
-        settings = std::make_shared<AppSettings>("./");
+        settings = std::make_shared<AppSettings>("");
         mqtt = std::make_shared<MQTT>(settings->getMqttServerAddress(), settings->getMqttServerPort());
         mqtt->setMainTopic(settings->getMqttTopic());
         modbus = std::make_shared<Modbus>(settings->getModbusDeviceName(), 
@@ -105,7 +105,7 @@ int main(int argc, char** argv)
         std::cerr << "Error initializing components: " << std::endl << e.what() << std::endl;
         return -1;
     }
-    /*
+
     modbus_t *mb;
     uint16_t tab_reg[32];
     uint32_t temp;
@@ -148,9 +148,9 @@ int main(int argc, char** argv)
         printf("%s: %.1f\n", regs->name, value);
         regs++;
     }
-    
+
     modbus_close(mb);
-    modbus_free(mb);*/
+    modbus_free(mb);
     while (run) {
         try {
             autoQuery->loopOnce();
