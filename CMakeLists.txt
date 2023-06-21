@@ -9,7 +9,11 @@ pkg_check_modules(LibConfig IMPORTED_TARGET libconfig++ REQUIRED)
 set (SRCS
     appsettings.h
     appsettings.cpp
+    autoquery.h
+    autoquery.cpp
     main.cpp
+    modbus.h
+    modbus.cpp
     mqtt.h
     mqtt.cpp
 )

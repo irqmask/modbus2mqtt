@@ -1,3 +1,13 @@
+modbus:
+{
+    device = "/dev/ttyUSB0";
+    baudrate = 9600;
+    databits = 8;
+    parity = "N";
+    stopbits = 1;
+    deviceaddress = 10;
+    topic = "sun2000";
+}
 mqtt:
 {
     address = "127.0.0.1";

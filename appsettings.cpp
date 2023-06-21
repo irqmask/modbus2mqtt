@@ -4,17 +4,24 @@
 #include <sys/types.h>
 #include <pwd.h>
 
+#include <chrono>
 #include <climits>
 #include <stdexcept>
 #include <iostream>
 #include <string>
 #include <sstream>
 
+#include "autoquery.h"
 
 using namespace libconfig;
 
 AppSettings::AppSettings(std::string pathAndFilename)
-    : mqttServerAddress("127.0.0.1")
+    : modbusBaudrate(9600)
+    , modbusParity('N')
+    , modbusDataBits(8)
+    , modbusStopBits(1)
+    , modbusAddress(10)
+    , mqttServerAddress("127.0.0.1")
     , mqttServerPort(1883)
 {
     const char* homedir;
@@ -51,6 +58,47 @@ AppSettings::AppSettings(std::string pathAndFilename)
         throw std::runtime_error(errmsg.str());
     }
     
+    // parse config file's Modbus settings
+    try {
+        const Setting &root = cfg.getRoot();
+        Setting &cfgMqtt = root["modbus"];
+        int tempDataBits, tempStopBits, tempModbusAddress;
+        std::string tempParity;
+
+        if (!(cfgMqtt.lookupValue("device", modbusDeviceName) &&
+              cfgMqtt.lookupValue("baudrate", modbusBaudrate) && 
+              cfgMqtt.lookupValue("databits", tempDataBits) &&
+              cfgMqtt.lookupValue("parity", tempParity) &&
+              cfgMqtt.lookupValue("stopbits", tempStopBits) &&
+              cfgMqtt.lookupValue("deviceaddress", tempModbusAddress))) {
+            throw std::runtime_error("Either node 'modbus' or contained properties 'device', 'baudrate', 'databits', 'parity', 'stopbits', 'device_address' are missing!");
+        }
+
+        if (tempDataBits < 7 || tempDataBits > 10) {
+            std::stringstream errmsg;
+            errmsg << "Invalid value " << tempDataBits << " for databits!";
+            throw std::runtime_error(errmsg.str());
+        }      
+        if (tempParity.length() != 1 || (tempParity[0] != 'N' && tempParity[0] != 'E' && tempParity[0] != 'O')) {
+            std::stringstream errmsg;
+            errmsg << "Invalid value " << tempParity << " for parity!";
+            throw std::runtime_error(errmsg.str());
+        }
+        if (tempStopBits < 0 || tempStopBits > 2) {
+            std::stringstream errmsg;
+            errmsg << "Invalid value " << tempStopBits << " for stopbits!";
+            throw std::runtime_error(errmsg.str());
+        }
+        modbusDataBits = tempDataBits;
+        modbusParity = tempParity[0];
+        modbusStopBits = tempStopBits;
+    } 
+    catch (const SettingNotFoundException &ex) {
+        std::stringstream errmsg;
+        errmsg << "Error reading config node 'modbus'! " << ex.what(); 
+        throw std::runtime_error(errmsg.str());
+    }
+
     // parse config file's MQTT settings
     try {
         const Setting &root = cfg.getRoot();
@@ -71,7 +119,9 @@ AppSettings::AppSettings(std::string pathAndFilename)
         mqttTopic = tempTopic;
     } 
     catch (const SettingNotFoundException &ex) {
-        throw std::runtime_error("Either node 'mqtt' or contained properties 'address', 'port' or 'topic' are missing!");
+        std::stringstream errmsg;
+        errmsg << "Error reading config node 'mqtt'! " << ex.what(); 
+        throw std::runtime_error(errmsg.str());
     }
 
     // parse config file's notifications settings
@@ -81,18 +131,59 @@ AppSettings::AppSettings(std::string pathAndFilename)
         int32_t count = cfgRegister.getLength();
         std::cout << count << " register found in config file" << std::endl;
         for (int32_t i=0; i<count; i++) {
-            AppSettings::Register r;
+            std::shared_ptr<AutoQuery::ItemQuery> q = std::make_shared<AutoQuery::ItemQuery>();
             Setting &cfgreg = cfgRegister[i];
-            if (!(cfgreg.lookupValue("name", r.name)
-                && cfgreg.lookupValue("interval", r.interval))) {
+            int interval;
+            if (!(cfgreg.lookupValue("name", q->name)
+                && cfgreg.lookupValue("interval", interval))) {
                 continue;
             }
-            modbusRegister.push_back(r);
+            q->interval = std::chrono::seconds(interval);
+            cfgreg.lookupValue("topic", q->topic); // optional
+            itemQueries.push_back(q);
         }
     }
     catch (const SettingNotFoundException &ex) {
-        throw std::runtime_error("Either node 'register' or contained properties 'name' or 'interval' are missing!");
+        std::stringstream errmsg;
+        errmsg << "Error reading config node 'register'! " << ex.what(); 
+        throw std::runtime_error(errmsg.str());
     }
+}
+
+
+const std::string &AppSettings::getModbusDeviceName() const
+{
+    return modbusDeviceName;
+}
+
+
+uint32_t AppSettings::getModbusBaudrate() const
+{
+    return modbusBaudrate;
+}
+
+
+uint8_t AppSettings::getModbusDataBits() const
+{
+    return modbusDataBits;
+}
+
+
+char AppSettings::getModbusParity() const
+{
+    return modbusParity;
+}
+
+
+uint8_t AppSettings::getModbusStopBits() const
+{
+    return modbusStopBits;
+}
+
+
+uint16_t AppSettings::getModbusAddress() const
+{
+    return modbusAddress;
 }
 
 
@@ -114,9 +205,9 @@ const std::string &AppSettings::getMqttTopic() const
 }
 
 
-const std::vector<AppSettings::Register> &AppSettings::getRegister() const
+const std::vector<std::shared_ptr<AutoQuery::ItemQuery>> &AppSettings::getQueryTable() const
 {
-    return modbusRegister;
+    return itemQueries;
 }
 
 
@@ -125,6 +216,15 @@ std::string AppSettings::getDefaultConfigFile()
     std::stringstream s;
 
     s << "# Example application configuration file" << std::endl;
+    s << "modbus:" << std::endl;
+    s << "{" << std::endl;
+    s << "    device = \"/dev/ttyUSB0\";" << std::endl;
+    s << "    baudrate = 9600;" << std::endl;
+    s << "    databits = 8;" << std::endl;
+    s << "    parity = \"N\";" << std::endl;
+    s << "    stopbits = 1;" << std::endl;
+    s << "    topic = \"sun2000\";" << std::endl; 
+    s << "}" << std::endl;
     s << "mqtt:" << std::endl;
     s << "{" << std::endl;
     s << "    address = \"127.0.0.1\";" << std::endl;
