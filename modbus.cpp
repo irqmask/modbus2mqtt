@@ -20,7 +20,7 @@ Modbus::Modbus(std::string device, uint32_t baudrate, uint8_t data_bits, char pa
         errstr << "Unable to create Modbus RTU context! " << modbus_strerror(errno);
         throw std::runtime_error(errstr.str());
     }
-    
+
     if (modbus_connect(mb) == -1) {
         std::stringstream errstr;
         errstr << "Modbus RTU connection failed! " << modbus_strerror(errno);
@@ -92,14 +92,14 @@ int32_t Modbus::readRegisterI32(int32_t reg_no)
 {
     uint16_t reg_vals[2];
     uint32_t temp;
+
     if (modbus_read_registers(mb, reg_no, 2, reg_vals) == -1) {
         std::stringstream errstr;
         errstr << "Modbus cannot read registers " << reg_no << " - " << (reg_no + 1) << "! " << modbus_strerror(errno);
         throw std::runtime_error(errstr.str());
     }
-
     temp = (uint32_t)reg_vals[0] << 16 | reg_vals[1];
-    return *((int32_t*)&temp);
+    return (int32_t)temp;
 }
 
 

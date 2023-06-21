@@ -75,8 +75,8 @@ void print_regs(const char* name, uint16_t* reg_values, uint16_t num_values)
 AutoQuery::ItemDefinitions SUN2000Regs = { 
     {"strings",     {30071,     1,  AutoQuery::ValType::VAL_TYPE_U16,   1.0f}},
     {"PV_P",        {32064,     1,  AutoQuery::ValType::VAL_TYPE_I32,   1000.0f}},
-    {"temperature", {32087,     1,  AutoQuery::ValType::VAL_TYPE_I32,   10.0f}},
-    {"ESU_soc",     {37004,     1,  AutoQuery::ValType::VAL_TYPE_I16,   10.0f}}
+    {"temperature", {32087,     1,  AutoQuery::ValType::VAL_TYPE_I16,   10.0f}},
+    {"ESU_soc",     {37004,     1,  AutoQuery::ValType::VAL_TYPE_U16,   10.0f}}
 };
 
 int main(int argc, char** argv)
