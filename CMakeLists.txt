@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(sun2000mqtt VERSION 0.1)
+project(modbus2mqtt VERSION 0.1)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(Modbus IMPORTED_TARGET libmodbus REQUIRED)

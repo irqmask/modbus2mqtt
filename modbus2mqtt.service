@@ -1,16 +1,14 @@
 [Unit]
-Description=sun2000mqtt daemon
+Description=modbus2mqtt daemon
 Wants=network.target
 
 [Service]
-User=
+User=<INSERT_USERNAME_HERE>
 Group=users
 WorkingDirectory=/tmp
 
 Type=idle
-ExecStart=/usr/local/bin/sun2000mqtt
-StandardOutput=syslog
-StandardError=syslog
+ExecStart=/usr/local/bin/modbus2mqtt
 
 [Install]
 WantedBy=multi-user.target
