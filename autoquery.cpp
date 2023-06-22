@@ -31,10 +31,8 @@ void AutoQuery::loadQueryTable(const std::vector<std::shared_ptr<ItemQuery>> &ta
         }
         // query item the first time immediately
         item->last_query = now - item->interval;
-        std::cerr << "set initial last query to " << item->last_query.count() << std::endl;
         entries.push_back(item);
     }
-    std::cerr << "entries size = " << entries.size() << std::endl;
 }
 
 

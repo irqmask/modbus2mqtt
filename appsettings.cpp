@@ -41,7 +41,6 @@ AppSettings::AppSettings(std::string pathAndFilename)
         // try to find config file in ~/.local/
         cfgPathAndFilename = homedir + std::string("/.local/") + FILENAME;
     }
-    system("ls");
     
     try {
         cfg.readFile(cfgPathAndFilename.c_str());
