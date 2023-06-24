@@ -61,7 +61,7 @@ modbus_register_t g_modbus_regs[] = {
 };
 
 
-void print_regs(const char* name, uint16_t* reg_values, uint16_t num_values)
+static void print_regs(const char* name, uint16_t* reg_values, uint16_t num_values)
 {
     printf("%s: ", name);
     for (int i=0; i<num_values; i++)
@@ -72,23 +72,9 @@ void print_regs(const char* name, uint16_t* reg_values, uint16_t num_values)
 }
 
 
-AutoQuery::ItemDefinitions SUN2000Regs = { 
-    {"strings",     {30071,     1,  AutoQuery::ValType::VAL_TYPE_U16,   1.0f}},
-    {"PV_P",        {32064,     1,  AutoQuery::ValType::VAL_TYPE_I32,   1000.0f}},
-    {"U_A",         {32069,     1,  AutoQuery::ValType::VAL_TYPE_U16,   10.0f}},
-    {"U_B",         {32070,     1,  AutoQuery::ValType::VAL_TYPE_U16,   10.0f}},
-    {"U_C",         {32071,     1,  AutoQuery::ValType::VAL_TYPE_U16,   10.0f}},
-    {"I_A",         {32072,     2,  AutoQuery::ValType::VAL_TYPE_I32,   1000.0f}},
-    {"I_B",         {32074,     2,  AutoQuery::ValType::VAL_TYPE_I32,   1000.0f}},
-    {"I_C",         {32076,     2,  AutoQuery::ValType::VAL_TYPE_I32,   1000.0f}},
-    {"temperature", {32087,     1,  AutoQuery::ValType::VAL_TYPE_I16,   10.0f}},
-    {"ESU_soc",     {37004,     1,  AutoQuery::ValType::VAL_TYPE_U16,   10.0f}}
-};
-
-int main(int argc, char** argv)
+static void testModbus()
 {
-
-        modbus_t *mb;
+    modbus_t *mb;
     uint16_t tab_reg[32];
     uint32_t temp;
     float value;
@@ -133,8 +119,43 @@ int main(int argc, char** argv)
 
     modbus_close(mb);
     modbus_free(mb);
+}
 
 
+AutoQuery::ItemDefinitions SUN2000Regs = { 
+    {"strings",     {30071,     1,  AutoQuery::ValType::VAL_TYPE_U16,   1.0f,       ""}},
+    {"State1",      {32001,     1,  AutoQuery::ValType::VAL_TYPE_U16,   1.0f,       ""}},
+    {"State2",      {32002,     1,  AutoQuery::ValType::VAL_TYPE_U16,   1.0f,       ""}},
+    {"State3",      {32003,     1,  AutoQuery::ValType::VAL_TYPE_U16,   1.0f,       ""}},
+    {"Alarm1",      {32008,     1,  AutoQuery::ValType::VAL_TYPE_U16,   1.0f,       ""}},
+    {"Alarm2",      {32009,     1,  AutoQuery::ValType::VAL_TYPE_U16,   1.0f,       ""}},
+    {"Alarm3",      {32010,     1,  AutoQuery::ValType::VAL_TYPE_U16,   1.0f,       ""}},
+    {"P_accum",     {32106,     2,  AutoQuery::ValType::VAL_TYPE_U32,   100.0f,     "kWh"}},
+    {"P_daily",     {32106,     2,  AutoQuery::ValType::VAL_TYPE_U32,   100.0f,     "kWh"}},
+    {"PV_P",        {32064,     1,  AutoQuery::ValType::VAL_TYPE_I32,   1000.0f,    "kW"}},
+    {"U_A",         {32069,     1,  AutoQuery::ValType::VAL_TYPE_U16,   10.0f,      "V"}},
+    {"U_B",         {32070,     1,  AutoQuery::ValType::VAL_TYPE_U16,   10.0f,      "V"}},
+    {"U_C",         {32071,     1,  AutoQuery::ValType::VAL_TYPE_U16,   10.0f,      "V"}},
+    {"I_A",         {32072,     2,  AutoQuery::ValType::VAL_TYPE_I32,   1000.0f,    "A"}},
+    {"I_B",         {32074,     2,  AutoQuery::ValType::VAL_TYPE_I32,   1000.0f,    "A"}},
+    {"I_C",         {32076,     2,  AutoQuery::ValType::VAL_TYPE_I32,   1000.0f,    "A"}},
+    {"temperature", {32087,     1,  AutoQuery::ValType::VAL_TYPE_I16,   10.0f,      "°C"}},
+
+    {"PV_U1",       {32016,     1,  AutoQuery::ValType::VAL_TYPE_I16,   10.0f,      "V"}},
+    {"PV_I1",       {32017,     1,  AutoQuery::ValType::VAL_TYPE_I16,   100.0f,     "A"}},
+    {"PV_U2",       {32018,     1,  AutoQuery::ValType::VAL_TYPE_I16,   10.0f,      "V"}},
+    {"PV_I2",       {32019,     1,  AutoQuery::ValType::VAL_TYPE_I16,   100.0f,     "A"}},
+
+    {"ESU_power",   {37001,     2,  AutoQuery::ValType::VAL_TYPE_I32,   1.0f,       "W"}},
+    {"ESU_soc",     {37004,     1,  AutoQuery::ValType::VAL_TYPE_U16,   10.0f,      "%"}},
+
+    {"M_P",         {37113,     2,  AutoQuery::ValType::VAL_TYPE_I32,   1.0f,       "W"}},
+    {"M_PExp",      {37119,     2,  AutoQuery::ValType::VAL_TYPE_I32,   100.0f,     "kWh"}},
+};
+
+
+int main(int argc, char** argv)
+{
     bool run = true;
     std::shared_ptr<AppSettings> settings;
     std::shared_ptr<MQTT> mqtt;

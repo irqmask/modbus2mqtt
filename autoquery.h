@@ -22,11 +22,13 @@ public:
         VAL_TYPE_STR
     };
 
-    struct ItemDefinition {
+    class ItemDefinition {
+    public:
         uint16_t reg_number;
         uint16_t reg_count;
         AutoQuery::ValType type;
         float scaling_factor;
+        std::string unit;
     };
     
     class ItemQuery {

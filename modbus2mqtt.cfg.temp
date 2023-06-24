@@ -14,8 +14,37 @@ mqtt:
     port = 1883;
     topic = "sun2000";
 }
-register = ( {
-    name = "hello";
-    interval = 60;
-}
+register = ( 
+    {
+        name = "P_accum";
+        interval = 120;
+    },
+    {
+        name = "P_daily";
+        interval = 120;
+    },
+    {
+        name = "PV_P";
+        interval = 20;
+    },
+    {
+        name = "temperature";
+        interval = 60;
+    },
+    {
+        name = "ESU_power";
+        interval = 20;
+    },
+    {
+        name = "ESU_soc";
+        interval = 60;
+    },
+    {
+        name = "M_P";
+        interval = 20;
+    },
+    {
+        name = "M_PExp";
+        interval = 120;
+    }
 )
