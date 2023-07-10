@@ -139,6 +139,7 @@ AutoQuery::ItemDefinitions SUN2000Regs = {
     {"I_A",         {32072,     2,  AutoQuery::ValType::VAL_TYPE_I32,   1000.0f,    "A"}},
     {"I_B",         {32074,     2,  AutoQuery::ValType::VAL_TYPE_I32,   1000.0f,    "A"}},
     {"I_C",         {32076,     2,  AutoQuery::ValType::VAL_TYPE_I32,   1000.0f,    "A"}},
+    {"P_active",    {32080,     2,  AutoQuery::ValType::VAL_TYPE_I32,   1000.0f,    "kW"}},
     {"temperature", {32087,     1,  AutoQuery::ValType::VAL_TYPE_I16,   10.0f,      "°C"}},
 
     {"PV_U1",       {32016,     1,  AutoQuery::ValType::VAL_TYPE_I16,   10.0f,      "V"}},
