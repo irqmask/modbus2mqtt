@@ -132,7 +132,7 @@ AutoQuery::ItemDefinitions SUN2000Regs = {
     {"Alarm3",      {32010,     1,  AutoQuery::ValType::VAL_TYPE_U16,   1.0f,       ""}},
     {"P_accum",     {32106,     2,  AutoQuery::ValType::VAL_TYPE_U32,   100.0f,     "kWh"}},
     {"P_daily",     {32106,     2,  AutoQuery::ValType::VAL_TYPE_U32,   100.0f,     "kWh"}},
-    {"PV_P",        {32064,     1,  AutoQuery::ValType::VAL_TYPE_I32,   1000.0f,    "kW"}},
+    {"PV_P",        {32064,     1,  AutoQuery::ValType::VAL_TYPE_I32,   1.0f,       "W"}},
     {"U_A",         {32069,     1,  AutoQuery::ValType::VAL_TYPE_U16,   10.0f,      "V"}},
     {"U_B",         {32070,     1,  AutoQuery::ValType::VAL_TYPE_U16,   10.0f,      "V"}},
     {"U_C",         {32071,     1,  AutoQuery::ValType::VAL_TYPE_U16,   10.0f,      "V"}},
