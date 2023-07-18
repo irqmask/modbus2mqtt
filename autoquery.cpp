@@ -2,9 +2,20 @@
 
 #include <chrono>
 #include <iostream>
+#include <sstream>
 
 #include "modbus.h"
 #include "mqtt.h"
+
+
+std::string to_string_with_precision(const float value, const int n = 3)
+{
+    std::ostringstream str;
+    str.precision(n);
+    str << std::fixed << value;
+    return std::move(str).str();
+}
+
 
 AutoQuery::AutoQuery(const AutoQuery::ItemDefinitions &rds, std::shared_ptr<Modbus> mb, std::shared_ptr<MQTT> mqtt)
     : reg_defs(rds)
@@ -65,7 +76,7 @@ void AutoQuery::loopOnce()
                 val /= rd.scaling_factor;
     
                 std::cerr << now.count() << ": Item " << item->name << " value " << val << " posted under topic " << item->topic << std::endl;
-                mqtt->publish(item->topic, std::to_string(val));
+                mqtt->publish(item->topic, to_string_with_precision(val, 3));
             }
         }
         catch (std::exception &e) {
